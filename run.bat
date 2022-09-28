@@ -1,0 +1,3 @@
+cd build
+main
+cd ..
