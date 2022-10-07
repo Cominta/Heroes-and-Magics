@@ -5,23 +5,6 @@
 #include <vector>
 #include <Windows.h>
 
-COORD GetConsoleCursorPosition(HANDLE hConsoleOutput) // без понятия что тут твориться, с инета кусок
-{
-    CONSOLE_SCREEN_BUFFER_INFO cbsi;
-
-    if (GetConsoleScreenBufferInfo(hConsoleOutput, &cbsi))
-    {
-        return cbsi.dwCursorPosition;
-    }
-
-    else
-    {
-        // The function failed. Call GetLastError() for details.
-        COORD invalid = { 0, 0 };
-        return invalid;
-    }
-}
-
 #include "logic.h"
 
 namespace mainmenu
@@ -33,10 +16,9 @@ namespace mainmenu
         void drawMenu();
 
         std::vector<std::string> menu = {
-            "Play",
-            "Shop",
-            "Army",
-            "Exit"
+            "██▓███   ██▓    ▄▄▄     ▓██   ██▓\n\t\t\t\t\t██░  ██▒▓██▒   ▒████▄    ▒██  ██▒\n\t\t\t\t\t██░ ██▓▒▒██░   ▒██  ▀█▄   ▒██ ██░\n\t\t\t\t\t██▄█▓▒ ▒▒██░   ░██▄▄▄▄██  ░ ▐██▓░\n\t\t\t\t\t██▒ ░  ░░██████▒▓█   ▓██▒ ░ ██▒▓░\n\t\t\t\t\t▓▒░ ░  ░░ ▒░▓  ░▒▒   ▓▒█░  ██▒▒▒\n\t\t\t\t\t▒ ░     ░ ░ ▒  ░ ▒   ▒▒ ░▓██ ░▒░\n\t\t\t\t\t░░         ░ ░    ░   ▒   ▒ ▒ ░░",
+            "▄▄▄       ██▀███   ███▄ ▄███  ██   ██▓\n\t\t\t\t\t████▄    ▓██ ▒ ██  ██▒▀█▀ ██▒ ▒██  ██▒\n\t\t\t\t\t██  ▀█▄  ▓██ ░▄█ ▒▓██    ▓██░  ▒██ ██░\n\t\t\t\t\t██▄▄▄▄██ ▒██▀▀█▄  ▒██    ▒██   ░ ▐██▓░\n\t\t\t\t\t█    ▓██▒░██▓ ██▒▒ ██▒   ░██▒   ██▒▓░\n\t\t\t\t\t▒▒   ▓▒█░░ ▒▓ ░▒▓░░ ▒░   ░  ░  ██▒▒▒\n\t\t\t\t\t▒   ▒▒ ░  ░▒ ░ ▒░░  ░      ░ ▓██ ░▒░\n\t\t\t\t\t░   ▒     ░░   ░ ░      ░    ▒ ▒ ░░\n\t\t\t\t\t░  ░   ░            ░    ░ ░  ",
+            "▓█████ ▒██   ██▒ ██  ███████\n\t\t\t\t\t▓█   ▀ ▒▒ █ █ ▒░▓██▒▓  ██▒ ▓▒\n\t\t\t\t\t▒███   ░░  █   ░▒██▒▒  ██░ ▒░\n\t\t\t\t\t▒██  ▄  ░ █ █ ▒ ░██░░ ▓██▓ ░ \n\t\t\t\t\t░█████▒▒██▒ ▒██▒░██░  ▒██▒ ░ \n\t\t\t\t\t░░ ▒░ ░▒▒ ░ ░▓ ░░▓    ▒ ░░ "
         };
         std::string name = "heroes and magics";
         bool firstTime = true;
