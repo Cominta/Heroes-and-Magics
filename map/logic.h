@@ -38,20 +38,20 @@ namespace map
 
                     else if (y >= 7 && y <= 11 && x <= 2)
                     {
-                        map[y].push_back(heroes::findSymbol(firstIt->first));
-                        firstIt++;
-
                         firstIt->second.x = x;
                         firstIt->second.y = y;
+
+                        map[y].push_back(heroes::findSymbol(firstIt->first));
+                        firstIt++;
                     }
 
                     else if (y >= 7 && y <= 11 && x >= width - 2)
                     {
-                        map[y].push_back(heroes::findSymbol(secondIt->first));
-                        secondIt++;
-
                         secondIt->second.x = x;
                         secondIt->second.y = y;
+
+                        map[y].push_back(heroes::findSymbol(secondIt->first));
+                        secondIt++;
                     }
 
                     else

@@ -9,7 +9,7 @@ namespace army
     {
         int checkKeys(int code);
         std::vector<heroes::heroesClass> checkUnitsPrint(std::map<heroes::heroesClass, heroes::Attributes> team);
-        void changeUnit(std::map<heroes::heroesClass, heroes::Attributes>& team);
+        std::map<heroes::heroesClass, heroes::Attributes> changeUnit(std::map<heroes::heroesClass, heroes::Attributes> team, int& x, int& y);
 
         int currentPoint = 0;
         int currentPointEdit = 0;
@@ -18,7 +18,7 @@ namespace army
         std::vector<heroes::heroesClass> choiceChange;
         bool editUnit = false;
 
-        int update(int code, std::map<heroes::heroesClass, heroes::Attributes>& firstTeam, std::map<heroes::heroesClass, heroes::Attributes>& secondTeam)
+        int update(int code, std::map<heroes::heroesClass, heroes::Attributes>& firstTeam, std::map<heroes::heroesClass, heroes::Attributes>& secondTeam, std::vector<std::vector<std::string>>& map)
         {
             if (code == KeyCode::ESCAPE)
             {
@@ -27,15 +27,19 @@ namespace army
 
             if (checkKeys(code) == 2)
             {
+                int x, y;
+
                 if (currentTeam)
                 {
-                    changeUnit(secondTeam);
+                    secondTeam = changeUnit(secondTeam, x, y);
                 }
 
                 else 
                 {
-                    changeUnit(firstTeam);
+                    firstTeam = changeUnit(firstTeam, x, y);
                 }
+
+                map[y][x] = heroes::findSymbol(choiceChange[currentPointEdit]);
             }
 
             return 0;
@@ -144,7 +148,7 @@ namespace army
             return toPrint;
         }
 
-        void changeUnit(std::map<heroes::heroesClass, heroes::Attributes>& team)
+        std::map<heroes::heroesClass, heroes::Attributes> changeUnit(std::map<heroes::heroesClass, heroes::Attributes> team, int& x, int& y)
         {
             std::vector<heroes::heroesClass> teamKeys;
 
@@ -153,14 +157,34 @@ namespace army
                 teamKeys.push_back(heroe.first);
             }
 
-            std::map<heroes::heroesClass, heroes::Attributes>::iterator it = team.find(teamKeys[currentPoint]);
-            
-            team.insert(it, std::pair<heroes::heroesClass, heroes::Attributes> {choiceChange[currentPointEdit], heroes::attributes[choiceChange[currentPointEdit]]});
-            it--;
-            team.erase(it);
+            std::map<heroes::heroesClass, heroes::Attributes> newTeam;
+            std::map<heroes::heroesClass, heroes::Attributes>::iterator it = team.begin();
+
+            for (int i = 0; i < heroes::count - 1; i++)
+            {
+                if (i == currentPoint)
+                {
+                    heroes::Attributes attr =  heroes::attributes[choiceChange[currentPointEdit]];
+                    attr.x = team[teamKeys[currentPoint]].x;
+                    attr.y = team[teamKeys[currentPoint]].y;
+                    newTeam.insert({choiceChange[currentPointEdit], attr});
+
+                    x = attr.x;
+                    y = attr.y;
+                }
+
+                else 
+                {
+                    newTeam.insert({it->first, it->second});
+                }
+
+                it++;
+            }
 
             editUnit = false;
             currentPointEdit = 0;
+
+            return newTeam;
         }
     }
 }

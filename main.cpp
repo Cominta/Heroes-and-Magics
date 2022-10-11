@@ -131,7 +131,7 @@ void mainLoop()
 				code = _getch();
 			}
 
-            int result = army::logic::update(code, firstTeam, secondTeam);
+            int result = army::logic::update(code, firstTeam, secondTeam, map);
 
             if (result == -1)
             {
