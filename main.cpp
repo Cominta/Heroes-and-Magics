@@ -9,6 +9,8 @@
 #include "army/graphics.h"
 #include "army/logic.h"
 
+#include "map/logic.h"
+
 void mainLoop();
 
 enum class States
@@ -28,7 +30,6 @@ int main()
 
 void mainLoop()
 {
-    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursor;
 
 	cursor.bVisible = false;
@@ -68,9 +69,14 @@ void mainLoop()
 
     SetCurrentConsoleFontEx(console, TRUE, &fontInfo); // Установить новый
 
+    int width = 30;
+    int height = 20;
+    std::vector<std::vector<std::string>> map;
+
+    map::logic::initMap(map, firstTeam, secondTeam, width, height);
+
     while (true)
     {
-
         if (currentState == States::MAIN_MENU)
         {
             system("cls");
@@ -114,10 +120,23 @@ void mainLoop()
 
         else if (currentState == States::ARMY)
         {
-            Sleep(2000);
             system("cls");
-            army::graphics::display(firstTeam, secondTeam);
-            army::logic::update();
+
+            army::graphics::display(map, firstTeam, secondTeam, width, height);
+
+            int code = _getch();
+
+            if (code == 224) 
+            { 
+				code = _getch();
+			}
+
+            int result = army::logic::update(code, firstTeam, secondTeam);
+
+            if (result == -1)
+            {
+                currentState = States::MAIN_MENU;
+            }
         }
     }
 }

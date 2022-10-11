@@ -3,98 +3,125 @@
 
 #include "../heroes.h"
 #include "../help.h"
+#include "../map/logic.h"
+#include "logic.h"
 
 namespace army
 {
     namespace graphics
     {
-        void drawArmy(std::map<heroes::heroesClass, heroes::Attributes>& firstTeam, std::map<heroes::heroesClass, heroes::Attributes>& secondTeam);
-        void drawFrame();
+        void printMap(std::vector<std::vector<std::string>>& map, int width, int height);
+        void drawMenuArmy(std::map<heroes::heroesClass, heroes::Attributes> team, int x, bool currentTeam);
+        void drawEditUnit(std::map<heroes::heroesClass, heroes::Attributes> team, int x);
 
-        HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+        bool editUnit = false;
 
-        void display(std::map<heroes::heroesClass, heroes::Attributes>& firstTeam, std::map<heroes::heroesClass, heroes::Attributes>& secondTeam)
+        void display(std::vector<std::vector<std::string>>& map, std::map<heroes::heroesClass, heroes::Attributes>& firstTeam, std::map<heroes::heroesClass, heroes::Attributes>& secondTeam, int width, int height)
         {
-            std::cout << "\n\t\t\tEdit your`s army\n\n\n\n";
 
-            drawFrame();
-            drawArmy(firstTeam, secondTeam);
-        }
+            std::cout << "\n\t\tEdit your`s army\n\n\n";
 
-        std::string findSymbol(heroes::heroesClass find)
-        {
-            for (auto& heroe : heroes::symbols)
-            {
-                if (heroe.second == find)
-                {
-                    return heroe.first;
-                }
-            }
-        }
+            printMap(map, width, height);
 
-        void drawTeam(std::map<heroes::heroesClass, heroes::Attributes>& team, int x, int y)
-        {
+            short x = 45;
+            short y = 4;
+
             COORD coord = {x, y};
             SetConsoleCursorPosition(console, coord);
+            drawMenuArmy(firstTeam, x, false);
 
-            std::map<heroes::heroesClass, heroes::Attributes>::iterator it = team.begin();
+            x = 65;
+            coord = {x, y};
+            SetConsoleCursorPosition(console, coord);
+            drawMenuArmy(secondTeam, x, true);
 
-            for (int y = 0; y < 5; y++)
+            if (army::logic::editUnit)
             {
-                for (int x = 0; x < 2; x++)
+                x = 85;
+                coord = {x, y};
+                SetConsoleCursorPosition(console, coord);
+
+                if (army::logic::currentTeam)
                 {
-                    std::cout << findSymbol(it->first);
-                    it++;
+                    drawEditUnit(secondTeam, x);
                 }
 
-                coord.Y += 1;
-                SetConsoleCursorPosition(console, coord);
+                else 
+                {
+                    drawEditUnit(firstTeam, x);
+                }
             }
         }
 
-        void drawArmy(std::map<heroes::heroesClass, heroes::Attributes>& firstTeam, std::map<heroes::heroesClass, heroes::Attributes>& secondTeam)
+        void printMap(std::vector<std::vector<std::string>>& map, int width, int height)
         {
-            int x = 25;
-            int y = 8;
-
-            drawTeam(firstTeam, x, y);
-            x = 37;
-            drawTeam(secondTeam, x, y);
-        }
-
-        void drawFrame()
-        {
-            std::cout << "\t\t\t";
-
-            int width = 15;
-            int height = 10;
+            std::cout << "\t";
 
             for (int y = 0; y <= height; y++)
             {
                 for (int x = 0; x <= width; x++)
                 {
-                    if (y == 0)
-                    {
-                        std::cout << "▄";
-                    }
-
-                    else if (y == height)
-                    {
-                        std::cout << "▀";
-                    }
-
-                    else if (x == 0 || x == width)
-                    {
-                        std::cout << "█";
-                    }
-
-                    else
-                    {
-                        std::cout << " ";
-                    }
+                    std::cout << map[y][x];
+                    SetConsoleTextAttribute(console, 15);
                 }
 
-                std::cout << "\n\t\t\t";
+                std::cout << "\n";
+
+                COORD coord = GetConsoleCursorPosition(console);
+                coord.X += 8;
+                SetConsoleCursorPosition(console, coord);
+            }
+        }
+
+        void drawMenuArmy(std::map<heroes::heroesClass, heroes::Attributes> team, int x, bool currentTeam) // false - первая команда, true - вторая
+        {
+            if (currentTeam)
+            {
+                std::cout << "Second Team: \n";
+            }
+
+            else 
+            {
+                std::cout << "First Team: \n";
+            }
+
+            int point = 0;
+
+            for (auto& heroe : team)
+            {
+                COORD coord = GetConsoleCursorPosition(console);
+                coord.X = x;
+                SetConsoleCursorPosition(console, coord);
+
+                if (army::logic::currentPoint == point && army::logic::currentTeam == currentTeam)
+                {
+                    SetConsoleTextAttribute(console, 9);
+                }
+
+                std::cout << heroes::names[heroe.first] << " (" << heroes::findSymbol(heroe.first) << ")\n";
+                SetConsoleTextAttribute(console, 15);
+                point++;
+            }
+        }
+
+        void drawEditUnit(std::map<heroes::heroesClass, heroes::Attributes> team, int x)
+        {
+            std::cout << "Edit unit: \n";
+
+            std::vector<heroes::heroesClass> toPrint = army::logic::checkUnitsPrint(team);
+            
+            for (int i = 0; i < toPrint.size(); i++)
+            {
+                if (i == army::logic::currentPointEdit)
+                {
+                    SetConsoleTextAttribute(console, 9);
+                }
+
+                COORD coord = GetConsoleCursorPosition(console);
+                coord.X = x;
+                SetConsoleCursorPosition(console, coord);
+                std::cout << heroes::names[toPrint[i]] << " (" << heroes::findSymbol(toPrint[i]) << ")\n";
+                SetConsoleTextAttribute(console, 15);
             }
         }
     }

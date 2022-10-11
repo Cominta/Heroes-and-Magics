@@ -1,7 +1,9 @@
-#ifndef GETCOORD_H
-#define GETCOORD_H
+#ifndef HELP_H
+#define HELP_H
 
 #include <Windows.h>
+
+HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
 COORD GetConsoleCursorPosition(HANDLE hConsoleOutput) // без понятия что тут твориться, с инета кусок
 {

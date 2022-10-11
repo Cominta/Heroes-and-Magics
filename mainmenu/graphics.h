@@ -6,6 +6,7 @@
 #include <Windows.h>
 
 #include "logic.h"
+#include "../help.h"
 
 namespace mainmenu
 {
@@ -23,14 +24,12 @@ namespace mainmenu
         std::string name = "heroes and magics";
         bool firstTime = true;
 
-        HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-
         void display()
         {
             system("cls");
 
-            mainmenu::graphics::drawName();
-            mainmenu::graphics::drawMenu();
+            drawName();
+            drawMenu();
         }        
 
         void drawName()
@@ -57,7 +56,7 @@ namespace mainmenu
                     SetConsoleCursorPosition(console, coord);
                 }
 
-                mainmenu::graphics::drawLetter(name[i], coord.X);
+                drawLetter(name[i], coord.X);
             }
 
             firstTime = false;
