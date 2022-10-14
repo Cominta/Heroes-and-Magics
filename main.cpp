@@ -10,14 +10,18 @@
 #include "army/logic.h"
 
 #include "map/logic.h"
+#include "map/graphics.h"
 
 void mainLoop();
+int getCode();
+void changeFont(int sizeY);
 
 enum class States
 {
     MAIN_MENU,
     BATTLE,
-    ARMY
+    ARMY,
+    MAP
 };
 
 States currentState = States::MAIN_MENU;
@@ -25,6 +29,7 @@ States currentState = States::MAIN_MENU;
 int main()
 {
     mainLoop();
+
     return 0;
 }
 
@@ -62,34 +67,31 @@ void mainLoop()
         {heroes::heroesClass::ANGEL, heroes::attributes[heroes::heroesClass::ANGEL]}
     };
 
-    CONSOLE_FONT_INFOEX fontInfo;
-    GetCurrentConsoleFontEx(console, TRUE, &fontInfo); // Получить текущий шрифт
-
-    fontInfo.dwFontSize.X = 2; // Размер (в логических единицах)
-
-    SetCurrentConsoleFontEx(console, TRUE, &fontInfo); // Установить новый
-
     int width = 30;
     int height = 20;
     std::vector<std::vector<std::string>> map;
 
     map::logic::initMap(map, firstTeam, secondTeam, width, height);
 
+    bool change = false;
+
     while (true)
     {
         if (currentState == States::MAIN_MENU)
         {
+            if (!change)
+            {
+                changeFont(10);
+                system("MODE 100, 70");
+                change = true;
+            }
+
             system("cls");
             mainmenu::graphics::display();
 
-            int code = _getch();
+            int code = getCode();
 
-            if (code == 224) 
-            { 
-				code = _getch();
-			}
-
-            int result = mainmenu::logic::update(code, mainmenu::graphics::menu.size()); // -1 - ничего, 0 - игра, 1 - армия, 2 - выход
+            int result = mainmenu::logic::update(code, mainmenu::graphics::menu.size()); // -1 - ничего, 0 - игра, 1 - армия, 2 - карта, 3 - выход
 
             switch (result)
             {
@@ -98,16 +100,17 @@ void mainLoop()
                     break;
 
                 case 1:
-                    CONSOLE_CURSOR_INFO cursor;
-
-                    cursor.bVisible = true;
-                    cursor.dwSize = 1;
-
-                    SetConsoleCursorInfo(console, &cursor);
+                    changeFont(20);
+                    system("MODE 100,30");
+                    change = false;
                     currentState = States::ARMY;
                     break;
 
                 case 2:
+                    currentState = States::MAP;
+                    break;
+
+                case 3:
                     _exit(3);
                     break;
             }
@@ -124,12 +127,7 @@ void mainLoop()
 
             army::graphics::display(map, firstTeam, secondTeam, width, height);
 
-            int code = _getch();
-
-            if (code == 224) 
-            { 
-				code = _getch();
-			}
+            int code = getCode();
 
             int result = army::logic::update(code, firstTeam, secondTeam, map);
 
@@ -138,5 +136,37 @@ void mainLoop()
                 currentState = States::MAIN_MENU;
             }
         }
+
+        else if (currentState == States::MAP)
+        {
+            system("cls");
+            map::graphics::display(map, width, height);
+            map::logic::update();
+        }
     }
+}
+
+int getCode()
+{
+    int code = _getch();
+
+    if (code == 224) 
+    { 
+        code = _getch();
+    }
+
+    return code;
+}
+
+void changeFont(int sizeY)
+{
+    CONSOLE_FONT_INFOEX fontInfo;
+    fontInfo.cbSize = sizeof fontInfo;
+    fontInfo.nFont = 0;
+    fontInfo.dwFontSize.X = 0;
+    fontInfo.dwFontSize.Y = sizeY;
+    fontInfo.FontFamily = FF_DONTCARE;
+    fontInfo.FontWeight = FW_NORMAL;
+    std::wcscpy(fontInfo.FaceName, L"Consolas");
+    SetCurrentConsoleFontEx(console, FALSE, &fontInfo);
 }

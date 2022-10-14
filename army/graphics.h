@@ -10,7 +10,6 @@ namespace army
 {
     namespace graphics
     {
-        void printMap(std::vector<std::vector<std::string>>& map, int width, int height);
         void drawMenuArmy(std::map<heroes::heroesClass, heroes::Attributes> team, int x, bool currentTeam);
         void drawEditUnit(std::map<heroes::heroesClass, heroes::Attributes> team, int x);
 
@@ -18,7 +17,6 @@ namespace army
 
         void display(std::vector<std::vector<std::string>>& map, std::map<heroes::heroesClass, heroes::Attributes>& firstTeam, std::map<heroes::heroesClass, heroes::Attributes>& secondTeam, int width, int height)
         {
-
             std::cout << "\n\t\tEdit your`s army\n\n\n";
 
             printMap(map, width, height);
@@ -50,26 +48,6 @@ namespace army
                 {
                     drawEditUnit(firstTeam, x);
                 }
-            }
-        }
-
-        void printMap(std::vector<std::vector<std::string>>& map, int width, int height)
-        {
-            std::cout << "\t";
-
-            for (int y = 0; y <= height; y++)
-            {
-                for (int x = 0; x <= width; x++)
-                {
-                    std::cout << map[y][x];
-                    SetConsoleTextAttribute(console, 15);
-                }
-
-                std::cout << "\n";
-
-                COORD coord = GetConsoleCursorPosition(console);
-                coord.X += 8;
-                SetConsoleCursorPosition(console, coord);
             }
         }
 

@@ -32,4 +32,23 @@ enum KeyCode
     DOWN = 80 
 };
 
+void printMap(std::vector<std::vector<std::string>>& map, int width, int height)
+{
+    std::cout << "\t";
+
+    for (int y = 0; y <= height; y++)
+    {
+        for (int x = 0; x <= width; x++)
+        {
+            std::cout << map[y][x];
+        }
+
+        std::cout << "\n";
+
+        COORD coord = GetConsoleCursorPosition(console);
+        coord.X += 8;
+        SetConsoleCursorPosition(console, coord);
+    }
+}
+
 #endif

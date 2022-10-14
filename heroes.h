@@ -12,17 +12,17 @@ namespace heroes
 
     enum heroesClass
     {
-        FANATIC,
-        SHOOTER,
-        SWORDSMAN,
-        CRUSADER,
-        RIDER,
+        ANGEL,
         ARCHANGEL,
         ARCHIGRIFON,
+        CENTAUR,
+        CRUSADER,
+        FANATIC,
         MONK,
+        RIDER,
+        SHOOTER,
+        SWORDSMAN,
         SPEARMAN,
-        ANGEL,
-        CENTAUR
     };
   
     struct Attributes

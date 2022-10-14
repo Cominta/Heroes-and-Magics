@@ -14,12 +14,13 @@ namespace mainmenu
     {
         void drawName();
         void drawLetter(char symbol, int coordX);
-        void drawMenu();
+        void drawMenu();        
 
         std::vector<std::string> menu = {
-            "██▓███   ██▓    ▄▄▄     ▓██   ██▓\n\t\t\t\t\t██░  ██▒▓██▒   ▒████▄    ▒██  ██▒\n\t\t\t\t\t██░ ██▓▒▒██░   ▒██  ▀█▄   ▒██ ██░\n\t\t\t\t\t██▄█▓▒ ▒▒██░   ░██▄▄▄▄██  ░ ▐██▓░\n\t\t\t\t\t██▒ ░  ░░██████▒▓█   ▓██▒ ░ ██▒▓░\n\t\t\t\t\t▓▒░ ░  ░░ ▒░▓  ░▒▒   ▓▒█░  ██▒▒▒\n\t\t\t\t\t▒ ░     ░ ░ ▒  ░ ▒   ▒▒ ░▓██ ░▒░\n\t\t\t\t\t░░         ░ ░    ░   ▒   ▒ ▒ ░░",
-            "▄▄▄       ██▀███   ███▄ ▄███  ██   ██▓\n\t\t\t\t\t████▄    ▓██ ▒ ██  ██▒▀█▀ ██▒ ▒██  ██▒\n\t\t\t\t\t██  ▀█▄  ▓██ ░▄█ ▒▓██    ▓██░  ▒██ ██░\n\t\t\t\t\t██▄▄▄▄██ ▒██▀▀█▄  ▒██    ▒██   ░ ▐██▓░\n\t\t\t\t\t█    ▓██▒░██▓ ██▒▒ ██▒   ░██▒   ██▒▓░\n\t\t\t\t\t▒▒   ▓▒█░░ ▒▓ ░▒▓░░ ▒░   ░  ░  ██▒▒▒\n\t\t\t\t\t▒   ▒▒ ░  ░▒ ░ ▒░░  ░      ░ ▓██ ░▒░\n\t\t\t\t\t░   ▒     ░░   ░ ░      ░    ▒ ▒ ░░\n\t\t\t\t\t░  ░   ░            ░    ░ ░  ",
-            "▓█████ ▒██   ██▒ ██  ███████\n\t\t\t\t\t▓█   ▀ ▒▒ █ █ ▒░▓██▒▓  ██▒ ▓▒\n\t\t\t\t\t▒███   ░░  █   ░▒██▒▒  ██░ ▒░\n\t\t\t\t\t▒██  ▄  ░ █ █ ▒ ░██░░ ▓██▓ ░ \n\t\t\t\t\t░█████▒▒██▒ ▒██▒░██░  ▒██▒ ░ \n\t\t\t\t\t░░ ▒░ ░▒▒ ░ ░▓ ░░▓    ▒ ░░ "
+            "██▓███   ██▓    ▄▄▄     ▓██   ██▓\n\t\t\t     ██░  ██▒▓██▒   ▒████▄    ▒██  ██▒\n\t\t\t     ██░ ██▓▒▒██░   ▒██  ▀█▄   ▒██ ██░\n\t\t\t     ██▄█▓▒ ▒▒██░   ░██▄▄▄▄██  ░ ▐██▓░\n\t\t\t     ██▒ ░  ░░██████▒▓█   ▓██▒ ░ ██▒▓░\n\t\t\t     ▓▒░ ░  ░░ ▒░▓  ░▒▒   ▓▒█░  ██▒▒▒\n\t\t\t     ▒ ░     ░ ░ ▒  ░ ▒   ▒▒ ░▓██ ░▒░",
+            "▄▄▄       ██▀███   ███▄ ▄███  ██   ██▓\n\t\t\t     ████▄    ▓██ ▒ ██  ██▒▀█▀ ██▒ ▒██  ██▒\n\t\t\t     ██  ▀█▄  ▓██ ░▄█ ▒▓██    ▓██░  ▒██ ██░\n\t\t\t     ██▄▄▄▄██ ▒██▀▀█▄  ▒██    ▒██   ░ ▐██▓░\n\t\t\t     █    ▓██▒░██▓ ██▒▒ ██▒   ░██▒   ██▒▓░\n\t\t\t     ▒▒   ▓▒█░░ ▒▓ ░▒▓░░ ▒░   ░  ░  ██▒▒▒\n\t\t\t     ▒   ▒▒ ░  ░▒ ░ ▒░░  ░      ░ ▓██ ░▒░\n\t\t\t     ░   ▒     ░░   ░ ░      ░    ▒ ▒ ░░",
+            " ███▄ ▄███▓ ▄▄▄       ██▓███  \n\t\t\t     ▓██▒▀█▀ ██▒▒████▄    ▓██░  ██▒\n\t\t\t     ▓██    ▓██░▒██  ▀█▄  ▓██░ ██▓▒\n\t\t\t     ▓██    ▓██░▒██  ▀█▄  ▓██░ ██▓▒\n\t\t\t     ▒██    ▒██ ░██▄▄▄▄██ ▒██▄█▓▒ ▒\n\t\t\t     ▒██▒   ░██▒ ▓█   ▓██▒▒██▒ ░  ░\n\t\t\t     ░ ▒░   ░  ░ ▒▒   ▓▒█░▒▓▒░ ░  ░\n\t\t\t     ░  ░      ░  ▒   ▒▒ ░░▒ ░\n\t\t\t     ░      ░     ░   ▒   ░░",
+            "▓█████ ▒██   ██▒ ██  ███████\n\t\t\t     ▓█   ▀ ▒▒ █ █ ▒░▓██▒▓  ██▒ ▓▒\n\t\t\t     ▒███   ░░  █   ░▒██▒▒  ██░ ▒░\n\t\t\t     ▒██  ▄  ░ █ █ ▒ ░██░░ ▓██▓ ░ \n\t\t\t     ░█████▒▒██▒ ▒██▒░██░  ▒██▒ ░ \n\t\t\t     ░░ ▒░ ░▒▒ ░ ░▓ ░░▓    ▒ ░░ "
         };
         std::string name = "heroes and magics";
         bool firstTime = true;
@@ -34,6 +35,7 @@ namespace mainmenu
 
         void drawName()
         {
+            bool tab = true;
             for (int i = 0; i < name.size(); i++)
             {
                 if (firstTime)
@@ -52,7 +54,18 @@ namespace mainmenu
                 else 
                 {
                     coord.Y += 9;
-                    coord.X = 0;
+
+                    if (tab)
+                    {
+                        coord.X = 25;
+                        tab = false;
+                    }
+
+                    else 
+                    {
+                        coord.X = 0;
+                    }
+
                     SetConsoleCursorPosition(console, coord);
                 }
 
@@ -249,14 +262,13 @@ namespace mainmenu
 
             for (int i = 0; i < menu.size(); i++)
             {
-                std::cout << "\t\t\t\t\t" << menu[i];
-
                 if (mainmenu::logic::currentPoint == i)
                 {
-                    std::cout << " ◄ ";
+                    SetConsoleTextAttribute(console, 9);
                 }
 
-                std::cout << "\n";
+                std::cout << "\t\t\t     " << menu[i] << "\n\n";
+                SetConsoleTextAttribute(console, 15);
             }
         }
     }

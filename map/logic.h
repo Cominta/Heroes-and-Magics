@@ -10,6 +10,11 @@ namespace map
 {
     namespace logic
     {
+        void update()
+        {
+            
+        }
+
         void initMap(std::vector<std::vector<std::string>>& map, std::map<heroes::heroesClass, heroes::Attributes>& firstTeam, std::map<heroes::heroesClass, heroes::Attributes>& secondTeam, int width, int height)
         {
             std::map<heroes::heroesClass, heroes::Attributes>::iterator firstIt = firstTeam.begin();
