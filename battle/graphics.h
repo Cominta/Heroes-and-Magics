@@ -5,7 +5,10 @@ namespace battle
 {
     namespace graphics
     {
-        
+        void display()
+        {
+            
+        }
     }
 }
 

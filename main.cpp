@@ -93,16 +93,21 @@ void mainLoop()
 
             int result = mainmenu::logic::update(code, mainmenu::graphics::menu.size()); // -1 - ничего, 0 - игра, 1 - армия, 2 - карта, 3 - выход
 
+            if (result != -1)
+            {
+                changeFont(20);
+                system("MODE 100,30");
+                change = false;
+            }
+
             switch (result)
             {
                 case 0:
                     currentState = States::BATTLE;
+                    battle::logic::init(firstTeam, secondTeam);
                     break;
 
                 case 1:
-                    changeFont(20);
-                    system("MODE 100,30");
-                    change = false;
                     currentState = States::ARMY;
                     break;
 
@@ -141,7 +146,15 @@ void mainLoop()
         {
             system("cls");
             map::graphics::display(map, width, height);
-            map::logic::update();
+
+            int code = getCode();
+
+            int result = map::logic::update(map, code, width, height);
+
+            if (result == -1)
+            {
+                currentState = States::MAIN_MENU;
+            }
         }
     }
 }
@@ -150,8 +163,8 @@ int getCode()
 {
     int code = _getch();
 
-    if (code == 224) 
-    { 
+    if (code == 224)
+    {
         code = _getch();
     }
 

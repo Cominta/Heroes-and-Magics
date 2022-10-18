@@ -10,7 +10,6 @@ namespace army
 {
     namespace graphics
     {
-        void drawMenuArmy(std::map<heroes::heroesClass, heroes::Attributes> team, int x, bool currentTeam);
         void drawEditUnit(std::map<heroes::heroesClass, heroes::Attributes> team, int x);
 
         bool editUnit = false;
@@ -26,12 +25,12 @@ namespace army
 
             COORD coord = {x, y};
             SetConsoleCursorPosition(console, coord);
-            drawMenuArmy(firstTeam, x, false);
+            drawMenuArmy(firstTeam, x, false, army::logic::currentTeam, army::logic::currentPoint);
 
             x = 65;
             coord = {x, y};
             SetConsoleCursorPosition(console, coord);
-            drawMenuArmy(secondTeam, x, true);
+            drawMenuArmy(secondTeam, x, true, army::logic::currentTeam, army::logic::currentPoint);
 
             if (army::logic::editUnit)
             {
@@ -48,37 +47,6 @@ namespace army
                 {
                     drawEditUnit(firstTeam, x);
                 }
-            }
-        }
-
-        void drawMenuArmy(std::map<heroes::heroesClass, heroes::Attributes> team, int x, bool currentTeam) // false - первая команда, true - вторая
-        {
-            if (currentTeam)
-            {
-                std::cout << "Second Team: \n";
-            }
-
-            else 
-            {
-                std::cout << "First Team: \n";
-            }
-
-            int point = 0;
-
-            for (auto& heroe : team)
-            {
-                COORD coord = GetConsoleCursorPosition(console);
-                coord.X = x;
-                SetConsoleCursorPosition(console, coord);
-
-                if (army::logic::currentPoint == point && army::logic::currentTeam == currentTeam)
-                {
-                    SetConsoleTextAttribute(console, 9);
-                }
-
-                std::cout << heroes::names[heroe.first] << " (" << heroes::findSymbol(heroe.first) << ")\n";
-                SetConsoleTextAttribute(console, 15);
-                point++;
             }
         }
 

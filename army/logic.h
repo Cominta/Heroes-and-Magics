@@ -47,53 +47,17 @@ namespace army
 
         int checkKeys(int code)
         {
-            if (code == KeyCode::UP)
+            if (editUnit)
             {
-                if (editUnit)
-                {
-                    currentPointEdit--;
-
-                    if (currentPointEdit < 0)
-                    {
-                        currentPointEdit = choiceChange.size() - 1;
-                    }
-                }
-
-                else 
-                {
-                    currentPoint--;
-
-                    if (currentPoint < 0)
-                    {
-                        currentPoint = 9;
-                    }
-                }
+                checkPoint(currentPointEdit, code, 9);
             }
 
-            else if (code == KeyCode::DOWN)
+            else
             {
-                if (editUnit)
-                {
-                    currentPointEdit++;
-
-                    if (currentPointEdit > choiceChange.size() - 1)
-                    {
-                        currentPointEdit = 0;
-                    }
-                }
-
-                else 
-                {
-                    currentPoint++;
-
-                    if (currentPoint > 9)
-                    {
-                        currentPoint = 0;
-                    }
-                }
+                checkPoint(currentPoint, code, 9);
             }
 
-            else if ((code == KeyCode::LEFT || code == KeyCode::RIGHT) && !editUnit)
+            if ((code == KeyCode::LEFT || code == KeyCode::RIGHT) && !editUnit)
             {
                 currentTeam = !currentTeam;
             }
