@@ -1,1 +1,1 @@
-g++ *.cpp -o build/main.exe
+g++ *.cpp -o build/main.exe -w

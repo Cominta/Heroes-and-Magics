@@ -33,7 +33,7 @@ enum KeyCode
     DOWN = 80 
 };
 
-void printMap(std::vector<std::vector<std::string>>& map, int width, int height)
+void printMap(std::vector<std::vector<std::string>>& map, int width, int height, int xColor = -1, int yColor = -1)
 {
     std::cout << "\t";
 
@@ -41,7 +41,13 @@ void printMap(std::vector<std::vector<std::string>>& map, int width, int height)
     {
         for (int x = 0; x <= width; x++)
         {
+            if (x == xColor && y == yColor)
+            {
+                SetConsoleTextAttribute(console, 9);
+            }
+
             std::cout << map[y][x];
+            SetConsoleTextAttribute(console, 15);
         }
 
         std::cout << "\n";
@@ -72,37 +78,6 @@ void checkPoint(int& point, int keyCode, int max)
         {
             point = 0;
         }
-    }
-}
-
-void drawMenuArmy(std::map<heroes::heroesClass, heroes::Attributes> team, int x, bool currentTeam, bool teamSelected, int currentPoint) // false - первая команда, true - вторая
-{
-    if (currentTeam)
-    {
-        std::cout << "Second Team: \n";
-    }
-
-    else 
-    {
-        std::cout << "First Team: \n";
-    }
-
-    int point = 0;
-
-    for (auto& heroe : team)
-    {
-        COORD coord = GetConsoleCursorPosition(console);
-        coord.X = x;
-        SetConsoleCursorPosition(console, coord);
-
-        if (currentPoint == point && teamSelected == currentTeam)
-        {
-            SetConsoleTextAttribute(console, 9);
-        }
-
-        std::cout << heroes::names[heroe.first] << " (" << heroes::findSymbol(heroe.first) << ")\n";
-        SetConsoleTextAttribute(console, 15);
-        point++;
     }
 }
 
