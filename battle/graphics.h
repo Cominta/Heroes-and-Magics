@@ -11,6 +11,7 @@ namespace battle
         void setCursor(int x, int y = -1);
         void printUnit(heroes::Attributes attr, int x);
         void printMenu(int x);
+        void coloredTeams(bool team, int color, int exceptionX = -1, int exceptionY = -1);
 
         std::vector<std::string> menu = {
             "Move",
@@ -40,6 +41,8 @@ namespace battle
                 colored = false;
             }
 
+            coloredTeams(false, 11, attr.x, attr.y);
+            coloredTeams(true, 14, attr.x, attr.y);
             printUnit(attr, x);
             printMenu(x);
 
@@ -67,6 +70,41 @@ namespace battle
             SetConsoleCursorPosition(console, coord);
         }
 
+        void coloredTeams(bool team, int color, int exceptionX, int exceptionY)
+        {
+            std::map<heroes::heroesClass, heroes::Attributes> teamColor;
+
+            if (team)
+            {
+                teamColor = battle::logic::secondTeam;
+            }
+
+            else 
+            {
+                teamColor = battle::logic::firstTeam;
+            }
+
+            SetConsoleTextAttribute(console, color);
+
+            for (auto& unit : teamColor)
+            {
+                int x = unit.second.x;
+                int y = unit.second.y;
+
+                if (x == exceptionX && y == exceptionY)
+                {
+                    continue;
+                }
+
+                battle::logic::mapToCoordCursor(x, y);
+
+                SetConsoleCursorPosition(console, {(short)x, (short)y});
+                std::cout << heroes::findSymbol(unit.first);
+            }
+
+            SetConsoleTextAttribute(console, 15);
+        }
+
         void coloredMoves(bool clear)
         {
             int xUnit = battle::logic::returnCurrentTeam()[battle::logic::currentUnit].x;
@@ -84,7 +122,7 @@ namespace battle
 
             else 
             {
-                SetConsoleTextAttribute(console, BACKGROUND_INTENSITY);
+                SetConsoleTextAttribute(console, 42);
             }
 
             // оптимизировать блять

@@ -19,7 +19,9 @@ namespace army
         {
             std::cout << "\n\t\tEdit your`s army\n\n\n";
 
-            printMap(map, width, height);
+            army::logic::checkColor(firstTeam, secondTeam);
+
+            printMap(map, width, height, army::logic::xToColor, army::logic::yToColor);
 
             short x = 45;
             short y = 4;

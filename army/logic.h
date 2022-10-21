@@ -10,10 +10,13 @@ namespace army
         int checkKeys(int code);
         std::vector<heroes::heroesClass> checkUnitsPrint(std::map<heroes::heroesClass, heroes::Attributes> team);
         std::map<heroes::heroesClass, heroes::Attributes> changeUnit(std::map<heroes::heroesClass, heroes::Attributes> team, int& x, int& y);
+        void checkColor(std::map<heroes::heroesClass, heroes::Attributes> firstTeam, std::map<heroes::heroesClass, heroes::Attributes> secondTeam); // определяем какого юнита красить
 
         int currentPoint = 0;
         int currentPointEdit = 0;
         bool currentTeam = false; // false - первая команда, true - вторая
+        int xToColor = -1;
+        int yToColor = -1;
 
         std::vector<heroes::heroesClass> choiceChange;
         bool editUnit = false;
@@ -149,6 +152,19 @@ namespace army
             currentPointEdit = 0;
 
             return newTeam;
+        }
+
+        void checkColor(std::map<heroes::heroesClass, heroes::Attributes> firstTeam, std::map<heroes::heroesClass, heroes::Attributes> secondTeam)
+        {
+            std::map<heroes::heroesClass, heroes::Attributes>::iterator it = (currentTeam ? secondTeam.begin() : firstTeam.begin());
+
+            for (int i = 0; i < currentPoint; i++)
+            {
+                it++;
+            }
+
+            xToColor = it->second.x;
+            yToColor = it->second.y;
         }
     }
 }
