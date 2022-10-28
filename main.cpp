@@ -107,6 +107,7 @@ void mainLoop()
                     break;
 
                 case 1:
+                    system("MODE 110,30");
                     currentState = States::ARMY;
                     break;
 

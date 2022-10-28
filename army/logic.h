@@ -2,6 +2,7 @@
 #define ARMY_LOGIC_H
 
 #include "../help.h"
+#include <math.h>
 
 namespace army
 {
@@ -14,6 +15,8 @@ namespace army
 
         int currentPoint = 0;
         int currentPointEdit = 0;
+        int currentPage = 0;
+        int maxPage;
         bool currentTeam = false; // false - первая команда, true - вторая
         int xToColor = -1;
         int yToColor = -1;
@@ -42,7 +45,9 @@ namespace army
                     firstTeam = changeUnit(firstTeam, x, y);
                 }
 
-                map[y][x] = heroes::findSymbol(choiceChange[currentPointEdit]);
+                map[y][x] = heroes::findSymbol(choiceChange[currentPointEdit + currentPage * 10]);
+                currentPointEdit = 0;
+                currentPage = 0;
             }
 
             return 0;
@@ -50,9 +55,14 @@ namespace army
 
         int checkKeys(int code)
         {
-            if (editUnit)
+            if (editUnit && currentPage != maxPage)
             {
                 checkPoint(currentPointEdit, code, 9);
+            }
+
+            else if (editUnit && currentPage == maxPage)
+            {
+                checkPoint(currentPointEdit, code, choiceChange.size() % 10 - 1);
             }
 
             else
@@ -63,6 +73,31 @@ namespace army
             if ((code == KeyCode::LEFT || code == KeyCode::RIGHT) && !editUnit)
             {
                 currentTeam = !currentTeam;
+            }
+
+            else if (code == KeyCode::LEFT)
+            {
+                currentPage--;
+
+                if (currentPage < 0)
+                {
+                    currentPage = maxPage;
+                }
+            }
+
+            else if (code == KeyCode::RIGHT)
+            {
+                currentPage++;
+
+                if (currentPage > maxPage)
+                {
+                    currentPage = 0;
+                }
+            }
+
+            if (currentPage == maxPage && currentPointEdit > choiceChange.size() % 10 - 1)
+            {
+                currentPointEdit = choiceChange.size() % 10 - 1;
             }
 
             else if (code == KeyCode::ENTER)
@@ -112,6 +147,7 @@ namespace army
             }
 
             choiceChange = toPrint;
+            maxPage = ceil(toPrint.size() / 10.0f) - 1;
             return toPrint;
         }
 
@@ -127,14 +163,14 @@ namespace army
             std::map<heroes::heroesClass, heroes::Attributes> newTeam;
             std::map<heroes::heroesClass, heroes::Attributes>::iterator it = team.begin();
 
-            for (int i = 0; i < heroes::count - 1; i++)
+            for (int i = 0; i < 10; i++)
             {
                 if (i == currentPoint)
                 {
-                    heroes::Attributes attr =  heroes::attributes[choiceChange[currentPointEdit]];
+                    heroes::Attributes attr =  heroes::attributes[choiceChange[currentPointEdit + currentPage * 10]];
                     attr.x = team[teamKeys[currentPoint]].x;
                     attr.y = team[teamKeys[currentPoint]].y;
-                    newTeam.insert({choiceChange[currentPointEdit], attr});
+                    newTeam.insert({choiceChange[currentPointEdit + currentPage * 10], attr});
 
                     x = attr.x;
                     y = attr.y;
@@ -149,7 +185,6 @@ namespace army
             }
 
             editUnit = false;
-            currentPointEdit = 0;
 
             return newTeam;
         }

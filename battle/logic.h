@@ -4,21 +4,37 @@
 #include "../help.h"
 #include <iostream>
 #include <time.h>
+#include "../map/logic.h"
 
 namespace battle
 {
     namespace logic
     {
-        struct Move;
+        struct Directions;
         void generateUnit();
         inline std::map<heroes::heroesClass, heroes::Attributes>& returnCurrentTeam();
-        void checkMove();
+        inline std::map<heroes::heroesClass, heroes::Attributes>& returnEnemyTeam();
+        Directions checkDirections();
         void moveCursor(int keyCode);
         void endTurn();
         void moveUnit();
         void loopGenerate();
+        Directions checkAttackNear();
+        std::vector<std::pair<int, int>> checkAttackLong();
+        template <typename T>
+        int linearSearch(T element, std::vector<T> array);
 
-        struct Move
+        enum class States // я не знаю почему я сделал переключалку нормальную только в главном меню и тут, а других местах дерьмово..
+        {
+            MENU,
+            MOVE_CHOICE,
+            ATTACK_CHOICE,
+            SHOW_HP
+        };
+
+        States currentState = States::MENU;
+
+        struct Directions
         {
             int left = 0;
             int right = 0;
@@ -32,16 +48,20 @@ namespace battle
         bool currentTeam = false;
         int currentPointMenu = 0;
         heroes::heroesClass currentUnit;
-        Move currentMoves;
+        Directions currentMoves;
 
         CONSOLE_CURSOR_INFO visible;
         CONSOLE_CURSOR_INFO invisible;
 
-        bool move = false; // что-то типо состояния. в думал, может сделать нормальный переключатель состояний, но и так сойдет
         int startX;
         int startY;
+
+        // движение
         int moveX;
         int moveY;
+
+        // атака
+        std::vector<std::pair<int, int>> attack;
 
         std::vector<std::vector<std::string>> map;
         int width;
@@ -49,6 +69,7 @@ namespace battle
 
         int update(int keyCode)
         {
+            returnCurrentTeam()[heroes::heroesClass::ANGEL].health = 30;
             if (keyCode == KeyCode::ESCAPE)
             {
                 endTurn();
@@ -56,43 +77,52 @@ namespace battle
                 return -1;
             }   
 
-            if (!move)
+            if (currentState == States::MENU)
             {
-                checkPoint(currentPointMenu, keyCode, 1);
+                checkPoint(currentPointMenu, keyCode, 2);
             }
 
-            else // двигаем курсор
+            else if (currentState == States::MOVE_CHOICE)// двигаем курсор
             {
                 moveCursor(keyCode);
             }
 
             // проверяем клавиши
-            if (!move && keyCode == KeyCode::ENTER) // выбрали пункт в меню
+            if (currentState == States::MENU && keyCode == KeyCode::ENTER) // выбрали пункт в меню
             {
+                startX = returnCurrentTeam()[currentUnit].x;
+                startY = returnCurrentTeam()[currentUnit].y;
+
                 switch (currentPointMenu)
                 {
                     case 0:
-                        move = true;
-                        startX = returnCurrentTeam()[currentUnit].x;
-                        startY = returnCurrentTeam()[currentUnit].y;
+                        currentState = States::MOVE_CHOICE;
                         moveX = startX;
                         moveY = startY;
 
                         SetConsoleCursorInfo(console, &visible);
 
                         break;
+
+                    case 1:
+                        currentState = States::ATTACK_CHOICE;
+                        // attack = checkAttackLong();
+                        break;
+
+                    case 2:
+                        currentState = States::SHOW_HP;
                 }
             }
 
-            else if (move && keyCode == KeyCode::ENTER && map[moveY][moveX] != heroes::findSymbol(currentUnit)) // выбрали куда пойти
+            else if (currentState == States::MOVE_CHOICE && keyCode == KeyCode::ENTER && map[moveY][moveX] != heroes::findSymbol(currentUnit)) // выбрали куда пойти
             {
                 moveUnit();
                 endTurn();
             }
 
-            else if (move && keyCode == KeyCode::SPACE) // вышли из выбора точки передвижения, передумали 
+            else if (currentState != States::MENU && keyCode == KeyCode::SPACE) // вышли 
             {
-                move = false;
+                currentState = States::MENU;
                 SetConsoleCursorInfo(console, &invisible);
             }
         }       
@@ -102,10 +132,15 @@ namespace battle
             return (currentTeam ? secondTeam : firstTeam);
         }
 
+        inline std::map<heroes::heroesClass, heroes::Attributes>& returnEnemyTeam()
+        {
+            return (currentTeam ? firstTeam : secondTeam);
+        }
+
         void generateUnit()
         {
             std::map<heroes::heroesClass, heroes::Attributes> team = returnCurrentTeam();
-            int unit = rand() % (team.size() - 0) - 0;
+            int unit = rand() % (team.size() - 0) - 1;
             std::map<heroes::heroesClass, heroes::Attributes>::iterator it = team.begin();
 
             for (int i = 0; i <= unit; i++)
@@ -114,7 +149,7 @@ namespace battle
             }
 
             currentUnit = it->first;
-            checkMove();
+            currentMoves = checkDirections();
         }
 
         void loopGenerate()
@@ -151,17 +186,17 @@ namespace battle
             loopGenerate();
         }
 
-        void checkMove()
+        Directions checkDirections()
         {
-            int unitsSpeed = returnCurrentTeam()[currentUnit].speed;
+            int unitsRange = returnCurrentTeam()[currentUnit].speed;
             int xUnit = returnCurrentTeam()[currentUnit].x;
             int yUnit = returnCurrentTeam()[currentUnit].y;
-            Move result;
+            Directions result;
 
             bool left = true;
             bool right = true;
 
-            for (int i = 1; i <= unitsSpeed; i++) // x
+            for (int i = 1; i <= unitsRange; i++) // x
             {
                 if (left && map[yUnit][xUnit - i] == " ")
                 {
@@ -187,7 +222,7 @@ namespace battle
             bool up = true;
             bool down = true;
 
-            for (int i = 1; i <= unitsSpeed; i++) // y
+            for (int i = 1; i <= unitsRange; i++) // y
             {
                 if (up && map[yUnit - i][xUnit] == " ")
                 {
@@ -210,7 +245,7 @@ namespace battle
                 }
             }
 
-            currentMoves = result;
+            return result;
         }
 
         void mapToCoordCursor(int& x, int& y)
@@ -266,7 +301,7 @@ namespace battle
         {
             SetConsoleCursorInfo(console, &invisible);
 
-            move = false;
+            currentState = States::MENU;
             moveX = 0;
             moveY = 0;
 
@@ -274,6 +309,100 @@ namespace battle
             currentMoves = {};
 
             loopGenerate();
+        }
+
+        Directions checkAttackNear()
+        {
+            Directions result;
+            std::map<heroes::heroesClass, heroes::Attributes> enemyTeam = returnEnemyTeam();
+
+            for (auto unit : enemyTeam)
+            {
+                std::cout << heroes::names[unit.first];
+                Sleep(1000);
+                if (unit.second.x == startX - 1 && unit.second.y == startY)
+                {
+                    result.left = 1;
+                }
+
+                else if (unit.second.x == startX + 1 && unit.second.y == startY)
+                {
+                    result.right = 1;
+                }
+
+                else if (unit.second.x == startX && unit.second.y == startY - 1)
+                {
+                    result.up = 1;
+                }
+
+                else if (unit.second.x == startX && unit.second.y == startY + 1)
+                {
+                    result.down = 1;
+                }
+            }
+
+            return result;
+        }
+
+        std::vector<std::pair<int, int>> checkAttackLong()
+        {
+            int x = startX;
+            int y = startY;
+            std::vector<std::pair<int, int>> result;
+            std::map<heroes::heroesClass, heroes::Attributes> enemyTeam = returnEnemyTeam();
+
+            while (map[y][x] != map::logic::elements[0])
+            {
+                x--;
+
+                if (enemyTeam.count(heroes::symbols[map[y][x]]) != 0 &&
+                    enemyTeam[heroes::symbols[map[y][x]]].x == x && enemyTeam[heroes::symbols[map[y][x]]].y == y)
+                {
+                    result.push_back(std::pair<int, int> {x, y});
+                }
+
+                else if (map[y][x] != " ")
+                {
+                    break;
+                }
+            }
+
+            x = startX;
+
+            while (map[y][x] != map::logic::elements[0])
+            {
+                x++;
+
+                if (enemyTeam.count(heroes::symbols[map[y][x]]) != 0 &&
+                    enemyTeam[heroes::symbols[map[y][x]]].x == x && enemyTeam[heroes::symbols[map[y][x]]].y == y)
+                {
+                    result.push_back(std::pair<int, int> {x, y});
+                    break;
+                }
+
+                else if (map[y][x] != " ")
+                {
+                    break;
+                }
+            }
+
+            std::cout << enemyTeam[heroes::heroesClass::ANGEL].x << " " << enemyTeam[heroes::heroesClass::ANGEL].y;
+            // std::cout << result.size();
+            Sleep(1000);
+        }
+
+        template <typename T>
+        int linearSearch(T element, std::vector<T> array)
+        {
+            for (int i = 0; i < array.size(); i++)
+            {
+                if (array[i] == element)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
     }
 }

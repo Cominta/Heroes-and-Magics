@@ -2,23 +2,36 @@
 #define BATTLE_GRAPHICS_H
 
 #include "logic.h"
+#include <math.h>
 
 namespace battle
 {
     namespace graphics
     {   
-        void coloredMoves(bool clear);
+        enum coloredSide
+        {
+            LEFT,
+            RIGHT,
+            UP,
+            DOWN
+        };
+
+        void coloredDirections(bool clear, battle::logic::Directions direction);
+        void colorSide(int range, COORD coord, coloredSide side);
         void setCursor(int x, int y = -1);
         void printUnit(heroes::Attributes attr, int x);
         void printMenu(int x);
+        void printHP(int x);
         void coloredTeams(bool team, int color, int exceptionX = -1, int exceptionY = -1);
 
         std::vector<std::string> menu = {
             "Move",
-            "Attack"
+            "Attack",
+            "Show hp"
         };
 
-        bool colored = false;
+        bool coloredMoves = false;
+        bool coloredAttack = false;
 
         void display()
         {
@@ -29,32 +42,41 @@ namespace battle
 
             printMap(battle::logic::map, battle::logic::width, battle::logic::height, attr.x, attr.y);
 
-            if (battle::logic::move)
-            {
-                coloredMoves(false);
-                colored = true;
-            }
-
-            else if (!battle::logic::move && colored)
-            {
-                coloredMoves(true);
-                colored = false;
-            }
-
             coloredTeams(false, 11, attr.x, attr.y);
             coloredTeams(true, 14, attr.x, attr.y);
-            printUnit(attr, x);
-            printMenu(x);
 
-            if (battle::logic::move)
+            if (battle::logic::currentState == battle::logic::States::MENU)
             {
-                coloredMoves(false);
+                printUnit(attr, x);
+                printMenu(x);
+            }
+
+            else if (battle::logic::currentState == battle::logic::States::MOVE_CHOICE)
+            {
+                coloredDirections(false, battle::logic::currentMoves);
+                coloredMoves = true;
 
                 int x = battle::logic::moveX;
                 int y = battle::logic::moveY;
                 battle::logic::mapToCoordCursor(x, y);
                 COORD coord = {x, y};
                 SetConsoleCursorPosition(console, coord);
+            }
+
+            else if (battle::logic::currentState == battle::logic::States::ATTACK_CHOICE)
+            {
+                // coloredDirections(false, battle::logic::attack);
+            }
+
+            else if (battle::logic::currentState == battle::logic::States::SHOW_HP)
+            {
+                printHP(x);
+            }
+
+            else if (battle::logic::currentState == battle::logic::States::MENU && coloredMoves)
+            {
+                coloredDirections(true, battle::logic::currentMoves);
+                coloredMoves = false;
             }
         }
 
@@ -86,10 +108,12 @@ namespace battle
 
             SetConsoleTextAttribute(console, color);
 
-            for (auto& unit : teamColor)
+            for (auto unit : teamColor)
             {
                 int x = unit.second.x;
                 int y = unit.second.y;
+                // std::cout << x << " " << y;
+                // Sleep(200);
 
                 if (x == exceptionX && y == exceptionY)
                 {
@@ -105,7 +129,7 @@ namespace battle
             SetConsoleTextAttribute(console, 15);
         }
 
-        void coloredMoves(bool clear)
+        void coloredDirections(bool clear, battle::logic::Directions direction)
         {
             int xUnit = battle::logic::returnCurrentTeam()[battle::logic::currentUnit].x;
             int yUnit = battle::logic::returnCurrentTeam()[battle::logic::currentUnit].y;
@@ -125,44 +149,46 @@ namespace battle
                 SetConsoleTextAttribute(console, 42);
             }
 
-            // оптимизировать блять
-            for (int i = 0; i < battle::logic::currentMoves.right; i++)
+            int side = 0;
+            int* range = &direction.left;
+            
+            for (int i = 0; i < 4; i++)
             {
-                coord.X++;
-                SetConsoleCursorPosition(console, coord);
-                std::cout << " ";
+                colorSide((*range), coord, (coloredSide)side);
+                side++;
+                range++;
             }
-
-            coord.X = xUnit;
-
-            for (int i = 0; i < battle::logic::currentMoves.left; i++)
-            {
-                coord.X--;
-                SetConsoleCursorPosition(console, coord);
-                std::cout << " ";
-            }
-
-            coord.X = xUnit;
-
-            for (int i = 0; i < battle::logic::currentMoves.up; i++)
-            {
-                coord.Y--;
-                SetConsoleCursorPosition(console, coord);
-                std::cout << " ";
-            }
-
-            coord.Y = yUnit;
-
-            for (int i = 0; i < battle::logic::currentMoves.down; i++)
-            {
-                coord.Y++;
-                SetConsoleCursorPosition(console, coord);
-                std::cout << " ";
-            }
-
-            coord.Y = yUnit;
 
             SetConsoleTextAttribute(console, 15);
+        }
+
+        void colorSide(int range, COORD coord, coloredSide side) 
+        {
+            for (int i = 0; i < range; i++)
+            {
+                if (side == coloredSide::LEFT)
+                {
+                    coord.X--;
+                }
+
+                else if (side == coloredSide::RIGHT)
+                {
+                    coord.X++;
+                }
+
+                else if (side == coloredSide::UP)
+                {
+                    coord.Y--;
+                }
+
+                else if (side == coloredSide::DOWN)
+                {
+                    coord.Y++;
+                }
+
+                SetConsoleCursorPosition(console, coord);
+                std::cout << " ";
+            }
         }
 
         void printUnit(heroes::Attributes attr, int x)
@@ -212,6 +238,38 @@ namespace battle
 
                 std::cout << i + 1 << ". " << menu[i] << "\n";
                 SetConsoleTextAttribute(console, 15);
+                setCursor(x);
+            }
+        }
+
+        void printHP(int x)
+        {
+            setCursor(x, 4);
+            std::cout << "HP: \n";
+            setCursor(x);
+
+            std::map<heroes::heroesClass, heroes::Attributes> team = battle::logic::returnCurrentTeam();
+
+            for (auto unit : team)
+            {
+                std::cout << heroes::names[unit.first] << " (" << heroes::findSymbol(unit.first) << ")";
+
+                setCursor(x + 20);
+                std::cout << "[";
+
+                int percent = ((float)unit.second.health / heroes::attributes[unit.first].health) * 100;
+
+                for (int i = 0; i < round(percent / 10); i++)
+                {
+                    std::cout << "█";
+                }
+
+                for (int i = 0; i < 10 - round(percent / 10); i++)
+                {
+                    std::cout << "-";
+                }
+
+                std::cout << "] " << unit.second.health << "/" << heroes::attributes[unit.first].health <<"\n";
                 setCursor(x);
             }
         }

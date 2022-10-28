@@ -89,20 +89,29 @@ namespace army
             std::cout << "Edit unit: \n";
 
             std::vector<heroes::heroesClass> toPrint = army::logic::checkUnitsPrint(team);
+            COORD coord = GetConsoleCursorPosition(console);
+
+            int i = army::logic::currentPage * 10;
+            int max = (toPrint.size() - i < 10 ? toPrint.size() - i + army::logic::currentPage * 10 : i + 10);
             
-            for (int i = 0; i < toPrint.size(); i++)
+            for (i; i < max; i++)
             {
-                if (i == army::logic::currentPointEdit)
+                if (i % 10 == army::logic::currentPointEdit)
                 {
                     SetConsoleTextAttribute(console, 9);
                 }
 
-                COORD coord = GetConsoleCursorPosition(console);
+                coord = GetConsoleCursorPosition(console);
                 coord.X = x;
                 SetConsoleCursorPosition(console, coord);
                 std::cout << heroes::names[toPrint[i]] << " (" << heroes::findSymbol(toPrint[i]) << ")\n";
                 SetConsoleTextAttribute(console, 15);
             }
+
+            coord.Y = 16;
+            coord.X = x;
+            SetConsoleCursorPosition(console, coord);
+            std::cout << "Current page: " << army::logic::currentPage + 1 << "/" << army::logic::maxPage + 1;
         }
     }
 }
