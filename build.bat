@@ -1,1 +1,1 @@
-g++ *.cpp -o build/main.exe -w
+g++ *.cpp -o build/main.exe -w -L./lib/ -lsfml-audio-d -lsfml-system-d

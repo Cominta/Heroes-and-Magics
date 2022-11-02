@@ -12,9 +12,11 @@
 #include "map/logic.h"
 #include "map/graphics.h"
 
+
 void mainLoop();
 int getCode();
 void changeFont(int sizeY);
+void initSounds();
 
 enum class States
 {
@@ -35,6 +37,9 @@ int main()
 
 void mainLoop()
 {
+    initSounds();
+    sounds::play("main_sound", sounds::volumeMain);
+
     CONSOLE_CURSOR_INFO cursor;
 
 	cursor.bVisible = false;
@@ -97,6 +102,8 @@ void mainLoop()
                 changeFont(20);
                 system("MODE 100,30");
                 change = false;
+
+                sounds::play("enter", sounds::volumeEnter);
             }
 
             switch (result)
@@ -190,4 +197,15 @@ void changeFont(int sizeY)
     fontInfo.FontWeight = FW_NORMAL;
     std::wcscpy(fontInfo.FaceName, L"Consolas");
     SetCurrentConsoleFontEx(console, FALSE, &fontInfo);
+}
+
+void initSounds()
+{
+    sounds::load("main_sound", true);
+    sounds::load("select_point");
+    sounds::load("enter");
+    sounds::load("select_page");
+    sounds::load("move_cursor");
+    sounds::load("build");
+    sounds::load("move_unit");
 }

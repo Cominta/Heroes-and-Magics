@@ -63,6 +63,8 @@ namespace heroes
         int speed;
         int x;
         int y;
+
+        void specialAttack();
     };
 
     std::map<heroesClass, Attributes> attributes = {

@@ -28,6 +28,8 @@ namespace army
         {
             if (code == KeyCode::ESCAPE)
             {
+                sounds::play("enter", sounds::volumeEnter);
+
                 return -1;
             }
 
@@ -72,11 +74,14 @@ namespace army
 
             if ((code == KeyCode::LEFT || code == KeyCode::RIGHT) && !editUnit)
             {
+                sounds::play("select_page", sounds::volumePage);
                 currentTeam = !currentTeam;
             }
 
             else if (code == KeyCode::LEFT)
             {
+                sounds::play("select_page", sounds::volumePage);
+
                 currentPage--;
 
                 if (currentPage < 0)
@@ -87,6 +92,8 @@ namespace army
 
             else if (code == KeyCode::RIGHT)
             {
+                sounds::play("select_page", sounds::volumePage);
+
                 currentPage++;
 
                 if (currentPage > maxPage)
@@ -102,6 +109,8 @@ namespace army
 
             else if (code == KeyCode::ENTER)
             {
+                sounds::play("enter", sounds::volumeEnter);
+
                 if (editUnit)
                 {
                     return 2;
@@ -111,6 +120,12 @@ namespace army
                 {
                     editUnit = true;
                 }
+            }
+
+            else if (code == KeyCode::SPACE)
+            {
+                sounds::play("enter", sounds::volumeEnter);
+                editUnit = false;
             }
 
             return 0;

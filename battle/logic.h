@@ -69,9 +69,11 @@ namespace battle
 
         int update(int keyCode)
         {
-            returnCurrentTeam()[heroes::heroesClass::ANGEL].health = 30;
+            // returnCurrentTeam()[heroes::heroesClass::ANGEL].health = 30;
             if (keyCode == KeyCode::ESCAPE)
             {
+                sounds::play("enter", sounds::volumeEnter);
+
                 endTurn();
                 currentTeam = false;
                 return -1;
@@ -84,12 +86,15 @@ namespace battle
 
             else if (currentState == States::MOVE_CHOICE)// двигаем курсор
             {
+                sounds::play("move_cursor", sounds::volumeMoveCursor);
                 moveCursor(keyCode);
             }
 
             // проверяем клавиши
             if (currentState == States::MENU && keyCode == KeyCode::ENTER) // выбрали пункт в меню
             {
+                sounds::play("enter", sounds::volumeEnter);
+
                 startX = returnCurrentTeam()[currentUnit].x;
                 startY = returnCurrentTeam()[currentUnit].y;
 
@@ -116,12 +121,15 @@ namespace battle
 
             else if (currentState == States::MOVE_CHOICE && keyCode == KeyCode::ENTER && map[moveY][moveX] != heroes::findSymbol(currentUnit)) // выбрали куда пойти
             {
+                sounds::play("move_unit", sounds::volumeMoveUnit);
                 moveUnit();
                 endTurn();
             }
 
             else if (currentState != States::MENU && keyCode == KeyCode::SPACE) // вышли 
             {
+                sounds::play("enter", sounds::volumeEnter);
+
                 currentState = States::MENU;
                 SetConsoleCursorInfo(console, &invisible);
             }
@@ -354,11 +362,14 @@ namespace battle
             while (map[y][x] != map::logic::elements[0])
             {
                 x--;
+                std::cout << enemyTeam.count(heroes::symbols[map[y][x]]);   
+                Sleep(1000);
 
-                if (enemyTeam.count(heroes::symbols[map[y][x]]) != 0 &&
+                if (enemyTeam.count(heroes::symbols[map[y][x]]) != 0 && 
                     enemyTeam[heroes::symbols[map[y][x]]].x == x && enemyTeam[heroes::symbols[map[y][x]]].y == y)
                 {
                     result.push_back(std::pair<int, int> {x, y});
+                    break;
                 }
 
                 else if (map[y][x] != " ")
@@ -372,6 +383,8 @@ namespace battle
             while (map[y][x] != map::logic::elements[0])
             {
                 x++;
+                std::cout << enemyTeam.count(heroes::symbols[map[y][x]]);   
+                Sleep(1000);
 
                 if (enemyTeam.count(heroes::symbols[map[y][x]]) != 0 &&
                     enemyTeam[heroes::symbols[map[y][x]]].x == x && enemyTeam[heroes::symbols[map[y][x]]].y == y)
@@ -386,9 +399,11 @@ namespace battle
                 }
             }
 
-            std::cout << enemyTeam[heroes::heroesClass::ANGEL].x << " " << enemyTeam[heroes::heroesClass::ANGEL].y;
+            // std::cout << enemyTeam[heroes::heroesClass::ANGEL].x << " " << enemyTeam[heroes::heroesClass::ANGEL].y;
             // std::cout << result.size();
-            Sleep(1000);
+            // Sleep(1000);
+
+            return result;
         }
 
         template <typename T>

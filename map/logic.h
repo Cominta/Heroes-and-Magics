@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include "../heroes.h"
+#include "../sounds.h"
 
 namespace map
 {
@@ -40,6 +41,14 @@ namespace map
         {
             if (keyCode == KeyCode::ESCAPE)
             {
+                sounds::play("enter", sounds::volumeEnter);
+
+                cursor.dwSize = 1;
+                cursor.bVisible = false;
+                SetConsoleCursorInfo(console, &cursor);
+
+                edit = false;
+
                 return -1;
             }
 
@@ -47,11 +56,14 @@ namespace map
             {
                 if (edit == true)
                 {
+                    sounds::play("build", sounds::volumeBuild);
                     editMap(map);
                 }
 
                 else 
                 {
+                    sounds::play("enter", sounds::volumeEnter);
+
                     cursor.dwSize = 1;
                     cursor.bVisible = true;
                     SetConsoleCursorInfo(console, &cursor);
@@ -62,6 +74,8 @@ namespace map
 
             else if (keyCode == KeyCode::SPACE)
             {
+                sounds::play("enter", sounds::volumeEnter);
+
                 cursor.dwSize = 1;
                 cursor.bVisible = false;
                 SetConsoleCursorInfo(console, &cursor);
@@ -76,6 +90,7 @@ namespace map
 
             else
             {
+                sounds::play("move_cursor", sounds::volumeMoveCursor);
                 moveCursor(keyCode, width, height);
             }
         }

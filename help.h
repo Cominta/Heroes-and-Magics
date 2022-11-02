@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 #include "heroes.h"
+#include "sounds.h"
 
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -22,7 +23,7 @@ COORD GetConsoleCursorPosition(HANDLE hConsoleOutput) // без понятия �
     }
 }
 
-enum KeyCode 
+enum KeyCode // не знаю нахуй оно нужно, но оно нужно
 { 
     ENTER = 13, 
     ESCAPE = 27, 
@@ -62,6 +63,7 @@ void checkPoint(int& point, int keyCode, int max)
 {
     if (keyCode == KeyCode::UP)
     {
+        sounds::play("select_point", sounds::volumeSelect);
         point--;
 
         if (point < 0)
@@ -72,6 +74,7 @@ void checkPoint(int& point, int keyCode, int max)
 
     else if (keyCode == KeyCode::DOWN)
     {
+        sounds::play("select_point", sounds::volumeSelect);
         point++;
 
         if (point > max)
