@@ -38,7 +38,6 @@ int main()
 void mainLoop()
 {
     initSounds();
-    sounds::play("main_sound", sounds::volumeMain);
     heroes::initAttacks();
 
     CONSOLE_CURSOR_INFO cursor;
@@ -80,6 +79,7 @@ void mainLoop()
     map::logic::initMap(map, firstTeam, secondTeam, width, height);
 
     bool change = false;
+    bool playBattle = false;
 
     while (true)
     {
@@ -87,6 +87,12 @@ void mainLoop()
         {
             if (!change)
             {
+                if (playBattle)
+                {
+                    sounds::stop("battle");
+                }
+
+                sounds::play("main_sound", sounds::volumeMain);
                 changeFont(10);
                 system("MODE 100, 70");
                 change = true;
@@ -110,6 +116,10 @@ void mainLoop()
             switch (result)
             {
                 case 0:
+                    sounds::stop("main_sound");
+                    sounds::play("battle", sounds::volumeMain);
+                    playBattle = true;
+
                     currentState = States::BATTLE;
                     battle::logic::init(firstTeam, secondTeam, map, width, height);
                     break;
@@ -149,6 +159,8 @@ void mainLoop()
             {
                 currentState = States::MAIN_MENU;
             }
+
+            code = -1;
         }
 
         else if (currentState == States::ARMY)
@@ -216,4 +228,7 @@ void initSounds()
     sounds::load("move_cursor");
     sounds::load("build");
     sounds::load("move_unit");
+    sounds::load("hurt");
+    sounds::load("battle", true);
+    sounds::load("kill");
 }

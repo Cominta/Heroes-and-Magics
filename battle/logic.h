@@ -20,18 +20,22 @@ namespace battle
         void moveUnit();
         void loopGenerate();
         void animAttackLong();
+        void attackNear();
+        void moveAnim();
         bool checkNextUnit();
         template <typename T>
         int linearSearch(T element, std::vector<T> array);
+        bool checkLongAttack();
 
-        enum class States // я не знаю почему я сделал переключалку нормальную только в главном меню и тут, а других местах дерьмово..
+        enum States // я не знаю почему я сделал переключалку нормальную только в главном меню и тут, а других местах дерьмово..
         {
             MENU,
             MOVE_CHOICE,
             ATTACK_CHOICE_DIFFERENT,
             ATTACK_CHOICE_SIDE,
             ATTACK_LONG,
-            SHOW_HP
+            SHOW_HP,
+            WIN
         };
 
         enum sides
@@ -86,18 +90,32 @@ namespace battle
         int width;
         int height;
 
+        // победа
+        bool winTeam;
+        bool end = false;
+
         int update(int keyCode)
         {
             // returnCurrentTeam()[heroes::heroesClass::ANGEL].health = 30;
+
             if (keyCode == KeyCode::ESCAPE)
             {
                 sounds::play("enter", sounds::volumeEnter);
 
-                endTurn();
+                if (!end)
+                {
+                    endTurn();
+                }
+
                 currentTeam = false;
                 currentState = States::MENU;
                 return -1;
             }   
+
+            if (currentState == States::WIN)
+            {
+                return 0;
+            }
 
             if (currentState == States::MENU)
             {
@@ -142,6 +160,7 @@ namespace battle
 
                 startX = (*returnCurrentTeam())[currentUnit].x;
                 startY = (*returnCurrentTeam())[currentUnit].y;
+                bool resultLong = true;
 
                 switch (currentPointMenu)
                 {
@@ -159,7 +178,7 @@ namespace battle
                         animY = startY;
                         currentState = States::ATTACK_CHOICE_DIFFERENT;
 
-                        if ((*returnCurrentTeam())[currentUnit].attackLongMax > 0)
+                        if ((*returnCurrentTeam())[currentUnit].attackLongMax > 0 && checkLongAttack())
                         {
                             longAttack = true;
                         }
@@ -186,6 +205,8 @@ namespace battle
 
             else if (currentState == States::ATTACK_CHOICE_DIFFERENT && keyCode == KeyCode::ENTER)
             {
+                sounds::play("enter", sounds::volumeEnter);
+
                 currentState = States::ATTACK_CHOICE_SIDE;
                 
                 if (currentPointAttack == 1)
@@ -201,8 +222,20 @@ namespace battle
 
             else if (currentState == States::ATTACK_CHOICE_SIDE && keyCode == KeyCode::ENTER)
             {
-                currentState = States::ATTACK_LONG;
+                sounds::play("enter", sounds::volumeEnter);
+
                 side = (sides)currentPointSide;
+
+                if (variantOfAttack)
+                {
+                    currentState = States::ATTACK_LONG;
+                }
+
+                else 
+                {
+                    // Sleep(1000);
+                    attackNear();
+                }
 
                 return 1;
             }
@@ -385,21 +418,23 @@ namespace battle
 
         void moveUnit()
         {
-            heroes::Attributes attrNew = (*returnCurrentTeam())[currentUnit];
-            int oldX = attrNew.x;
-            int oldY = attrNew.y;
-            attrNew.x = moveX;
-            attrNew.y = moveY;
-
-            map[attrNew.y][attrNew.x] = heroes::findSymbol(currentUnit);
-            (*returnCurrentTeam())[currentUnit] = attrNew;
+            heroes::Attributes* attrNew = &(*returnCurrentTeam())[currentUnit];
+            int oldX = attrNew->x;
+            int oldY = attrNew->y;
+            attrNew->x = moveX;
+            attrNew->y = moveY;
             
             map[oldY][oldX] = " ";
+            map[attrNew->y][attrNew->x] = heroes::findSymbol(currentUnit);
         }
 
         void endTurn()
         {
             SetConsoleCursorInfo(console, &invisible);
+
+            currentPointMenu = 0;
+            currentPointAttack = 0;
+            currentPointSide = 0;
 
             currentState = States::MENU;
             moveX = 0;
@@ -425,6 +460,18 @@ namespace battle
                 map[animY][animX] = " ";
             }
 
+            moveAnim();
+
+            if (checkNextUnit())
+            {
+                return;
+            }
+
+            map[animY][animX] = symbol;
+        }
+
+        void moveAnim()
+        {
             if (side == sides::RIGHT)
             {
                 animX++;
@@ -444,13 +491,16 @@ namespace battle
             {
                 animY++;
             }
+        }
 
-            if (checkNextUnit())
+        void attackNear()
+        {
+            moveAnim();
+            
+            if (!checkNextUnit() && !end)
             {
-                return;
+                endTurn();
             }
-
-            map[animY][animX] = symbol;
         }
 
         bool checkNextUnit()
@@ -465,9 +515,52 @@ namespace battle
             heroes::Attributes* unitEnemy = &(*enemyTeam)[heroes::symbols[map[animY][animX]]];
             heroes::Attributes* unitCurrent = &(*currentTeam)[currentUnit];
 
-            if (enemyTeam->count(heroes::symbols[map[animY][animX]]) == 1)
+            if (enemyTeam->count(heroes::symbols[map[animY][animX]]) == 1 && (*enemyTeam)[heroes::symbols[map[animY][animX]]].x == animX && 
+                (*enemyTeam)[heroes::symbols[map[animY][animX]]].y == animY)
             {
-                unitEnemy->health -= unitCurrent->attackLongMax;
+                int damage = 0;
+
+                if (variantOfAttack)
+                {
+                    damage = rand() % (unitCurrent->attackLongMax - unitCurrent->attackLongMin + 1) + unitCurrent->attackLongMin;
+                }
+
+                else
+                {
+                    damage = rand() % (unitCurrent->attackNearMax - unitCurrent->attackNearMin + 1) + unitCurrent->attackNearMin;
+                }
+
+                int percent = ((float)unitEnemy->armor / damage) * 100; 
+
+                if (percent > 30)
+                {
+                    percent = 30;
+                }
+
+                damage -= (float)damage / 100 * 30;
+                
+                unitEnemy->health -= damage;
+
+                if (unitEnemy->health <= 0)
+                {
+                    sounds::play("kill", sounds::volumeKill);
+                    enemyTeam->erase(heroes::symbols[map[animY][animX]]);
+                    map[animY][animX] = " ";
+
+                    if (enemyTeam->size() == 0)
+                    {
+                        winTeam = currentTeam;
+                        end = true;
+                        currentState = States::WIN;
+
+                        return false;
+                    }
+                }
+
+                else 
+                {
+                    sounds::play("hurt", sounds::volumeHurt);
+                }
             }
 
             endTurn();
@@ -487,6 +580,49 @@ namespace battle
             }
 
             return -1;
+        }
+
+        bool checkLongAttack()
+        {
+            std::map<heroes::heroesClass, heroes::Attributes>* enemyTeam = returnEnemyTeam();
+
+            bool resultLong = true;
+
+            // side = (sides)0;
+            // moveAnim();
+
+            if ((map[animY][animX - 1] != " " && enemyTeam->count(heroes::symbols[map[animY][animX - 1]]) == 1 && 
+                (*enemyTeam)[heroes::symbols[map[animY][animX - 1]]].x == animX - 1 && 
+                (*enemyTeam)[heroes::symbols[map[animY][animX - 1]]].y == animY) ||
+                (map[animY][animX + 1] != " " && enemyTeam->count(heroes::symbols[map[animY][animX + 1]]) == 1 && 
+                (*enemyTeam)[heroes::symbols[map[animY][animX + 1]]].x == animX + 1 && 
+                (*enemyTeam)[heroes::symbols[map[animY][animX + 1]]].y == animY) ||
+                (map[animY - 1][animX] != " " && enemyTeam->count(heroes::symbols[map[animY - 1][animX]]) == 1 && 
+                (*enemyTeam)[heroes::symbols[map[animY - 1][animX]]].x == animX && 
+                (*enemyTeam)[heroes::symbols[map[animY - 1][animX]]].y == animY - 1) ||
+                (map[animY + 1][animX] != " " && enemyTeam->count(heroes::symbols[map[animY + 1][animX]]) == 1 && 
+                (*enemyTeam)[heroes::symbols[map[animY + 1][animX]]].x == animX && 
+                (*enemyTeam)[heroes::symbols[map[animY + 1][animX]]].y == animY + 1))
+            {   
+                return false;
+            }
+
+            return true;
+
+            // for (int pointSide = 0; pointSide < 4; pointSide++)
+            // {
+
+            //     if (false)
+            //     {
+            //         resultLong = false;
+            //         break;
+            //     }
+
+            //     animX = startX;
+            //     animY = startY;
+            // }
+
+            // return resultLong;
         }
     }
 }

@@ -29,7 +29,23 @@ namespace battle
 
         void display()
         {
-            std::cout << "\n\t\tBATTLE!!!\n\n\n";
+            if (battle::logic::currentState == battle::logic::States::WIN)
+            {
+                if (battle::logic::winTeam)
+                {
+                    std::cout << "\n\t\tSECOND TEAM WIN!!!\n\n\n";
+                }
+
+                else 
+                {
+                    std::cout << "\n\t\tFIRST TEAM WIN!!!\n\n\n";
+                }
+            }
+
+            else 
+            {
+                std::cout << "\n\t\tBATTLE!!!\n\n\n";
+            }
 
             short x = 45;
             heroes::Attributes attr = (*battle::logic::returnCurrentTeam())[battle::logic::currentUnit];
@@ -216,7 +232,9 @@ namespace battle
             std::cout << "Attributes: ";
             std::cout << "hp = " << attr.health << ", armor = " << attr.armor << "\n";
             setCursor(x);
-            std::cout << "attack near (min) = " << attr.attackNearMin << ", attack long (min) = " << attr.attackLongMin << "\n";
+            std::cout << "attack near (min) = " << attr.attackNearMin << ", attack near (max) = " << attr.attackNearMax << "\n";
+            setCursor(x);
+            std::cout << "attack long (min) = " << attr.attackLongMin << ", attack long (max) = " << attr.attackLongMax << "\n";
             setCursor(x);
             std::cout << "speed = " << attr.speed << "\n";
         }
@@ -317,7 +335,7 @@ namespace battle
                 SetConsoleTextAttribute(console, 9);
             }
 
-            std::cout << "Attack near\n";
+            std::cout << "1. Attack near\n";
             SetConsoleTextAttribute(console, 15);
             setCursor(x);
 
@@ -328,7 +346,7 @@ namespace battle
                     SetConsoleTextAttribute(console, 9);
                 }
 
-                std::cout << "Attack long\n";
+                std::cout << "2. Attack long\n";
                 SetConsoleTextAttribute(console, 15);
             }
 

@@ -19,6 +19,8 @@ namespace sounds
     float volumeMoveCursor = 10.0f;
     float volumeBuild = 10.0f;
     float volumeMoveUnit = 20.0f;
+    float volumeHurt = 20.0f;
+    float volumeKill = 10.0f;
 
     void load(std::string name, bool loop = false)
     {
