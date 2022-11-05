@@ -8,21 +8,15 @@ namespace battle
 {
     namespace graphics
     {   
-        enum coloredSide
-        {
-            LEFT,
-            RIGHT,
-            UP,
-            DOWN
-        };
-
         void coloredDirections(bool clear, battle::logic::Directions direction);
-        void colorSide(int range, COORD coord, coloredSide side);
+        void colorSide(int range, COORD coord, battle::logic::sides side);
         void setCursor(int x, int y = -1);
         void printUnit(heroes::Attributes attr, int x);
         void printMenu(int x);
         void printHP(int x);
         void coloredTeams(bool team, int color, int exceptionX = -1, int exceptionY = -1);
+        void printAttackChoice(int x);
+        void printAttackDifferent(int x);
 
         std::vector<std::string> menu = {
             "Move",
@@ -38,7 +32,7 @@ namespace battle
             std::cout << "\n\t\tBATTLE!!!\n\n\n";
 
             short x = 45;
-            heroes::Attributes attr = battle::logic::returnCurrentTeam()[battle::logic::currentUnit];
+            heroes::Attributes attr = (*battle::logic::returnCurrentTeam())[battle::logic::currentUnit];
 
             printMap(battle::logic::map, battle::logic::width, battle::logic::height, attr.x, attr.y);
 
@@ -63,9 +57,14 @@ namespace battle
                 SetConsoleCursorPosition(console, coord);
             }
 
-            else if (battle::logic::currentState == battle::logic::States::ATTACK_CHOICE)
+            else if (battle::logic::currentState == battle::logic::States::ATTACK_CHOICE_DIFFERENT)
             {
-                // coloredDirections(false, battle::logic::attack);
+                printAttackDifferent(x);
+            }
+
+            else if (battle::logic::currentState == battle::logic::States::ATTACK_CHOICE_SIDE)
+            {
+                printAttackChoice(x);
             }
 
             else if (battle::logic::currentState == battle::logic::States::SHOW_HP)
@@ -131,8 +130,8 @@ namespace battle
 
         void coloredDirections(bool clear, battle::logic::Directions direction)
         {
-            int xUnit = battle::logic::returnCurrentTeam()[battle::logic::currentUnit].x;
-            int yUnit = battle::logic::returnCurrentTeam()[battle::logic::currentUnit].y;
+            int xUnit = (*battle::logic::returnCurrentTeam())[battle::logic::currentUnit].x;
+            int yUnit = (*battle::logic::returnCurrentTeam())[battle::logic::currentUnit].y;
 
             battle::logic::mapToCoordCursor(xUnit, yUnit);
 
@@ -154,7 +153,7 @@ namespace battle
             
             for (int i = 0; i < 4; i++)
             {
-                colorSide((*range), coord, (coloredSide)side);
+                colorSide((*range), coord, (battle::logic::sides)side);
                 side++;
                 range++;
             }
@@ -162,26 +161,26 @@ namespace battle
             SetConsoleTextAttribute(console, 15);
         }
 
-        void colorSide(int range, COORD coord, coloredSide side) 
+        void colorSide(int range, COORD coord, battle::logic::sides side) 
         {
             for (int i = 0; i < range; i++)
             {
-                if (side == coloredSide::LEFT)
+                if (side == battle::logic::sides::LEFT)
                 {
                     coord.X--;
                 }
 
-                else if (side == coloredSide::RIGHT)
+                else if (side == battle::logic::sides::RIGHT)
                 {
                     coord.X++;
                 }
 
-                else if (side == coloredSide::UP)
+                else if (side == battle::logic::sides::UP)
                 {
                     coord.Y--;
                 }
 
-                else if (side == coloredSide::DOWN)
+                else if (side == battle::logic::sides::DOWN)
                 {
                     coord.Y++;
                 }
@@ -248,7 +247,7 @@ namespace battle
             std::cout << "HP: \n";
             setCursor(x);
 
-            std::map<heroes::heroesClass, heroes::Attributes> team = battle::logic::returnCurrentTeam();
+            std::map<heroes::heroesClass, heroes::Attributes> team = (*battle::logic::returnCurrentTeam());
 
             for (auto unit : team)
             {
@@ -272,6 +271,68 @@ namespace battle
                 std::cout << "] " << unit.second.health << "/" << heroes::attributes[unit.first].health <<"\n";
                 setCursor(x);
             }
+        }
+
+        void printAttackChoice(int x)
+        {
+            setCursor(x, 4);
+            std::cout << "Choose side: \n";
+
+            // if ((*battle::logic::returnCurrentTeam())[battle::logic::currentUnit].attackNearMax != 0)
+            // {
+            //     std::cout << "(attack long)"
+            // }
+
+            setCursor(x);
+
+            std::vector<std::string> menu = {
+                "Left",
+                "Right",
+                "Up",
+                "Down"
+            };
+
+            for (int i = 0; i < menu.size(); i++)
+            {
+                if (battle::logic::currentPointSide == i)
+                {
+                    SetConsoleTextAttribute(console, 9);
+                }
+
+                std::cout << i + 1 << ". " << menu[i] << "\n";
+                SetConsoleTextAttribute(console, 15);
+                setCursor(x);
+            }
+        }
+
+        void printAttackDifferent(int x)
+        {
+            setCursor(x, 4);
+            std::cout << "Choose variant of attack: \n";
+
+            setCursor(x);
+
+            if (battle::logic::currentPointAttack == 0)
+            {
+                SetConsoleTextAttribute(console, 9);
+            }
+
+            std::cout << "Attack near\n";
+            SetConsoleTextAttribute(console, 15);
+            setCursor(x);
+
+            if (battle::logic::longAttack)
+            {
+                if (battle::logic::currentPointAttack == 1)
+                {
+                    SetConsoleTextAttribute(console, 9);
+                }
+
+                std::cout << "Attack long\n";
+                SetConsoleTextAttribute(console, 15);
+            }
+
+            setCursor(x);
         }
     }
 }

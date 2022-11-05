@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <functional>
 
 namespace heroes
 {
@@ -51,6 +52,11 @@ namespace heroes
         ELEMENTALMAIND,
         FENIX,
     };
+
+    struct specialAttackArgs
+    {
+
+    };
   
     struct Attributes
     {
@@ -64,7 +70,7 @@ namespace heroes
         int x;
         int y;
 
-        void specialAttack();
+        std::function<void(specialAttackArgs args)> specialAttack;
     };
 
     std::map<heroesClass, Attributes> attributes = {
@@ -107,6 +113,8 @@ namespace heroes
         {heroesClass::ELEMENTALMAIND, Attributes {12, 15, 0, 0, 13, 80, 9}},
         {heroesClass::FENIX, Attributes {17, 21, 0, 0, 18, 200, 21}}
     };
+
+    // attributes[heroesClass::FANATIC].specialAttack = fanatic;
 
     std::map<std::string, heroesClass> symbols = {
         {"ⱹ", heroesClass::FANATIC},
@@ -189,6 +197,16 @@ namespace heroes
         {heroesClass::ELEMENTALMAIND,"PsychicElement"},
         {heroesClass::FENIX,"Fenix"}
     };
+
+    void fanatic(specialAttackArgs args)
+    {
+        std::cout << "W";
+    }
+
+    void initAttacks()
+    {
+        attributes[heroesClass::FANATIC].specialAttack = fanatic;
+    }
 
     std::string findSymbol(heroes::heroesClass find)
     {

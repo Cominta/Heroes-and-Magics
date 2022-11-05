@@ -39,6 +39,7 @@ void mainLoop()
 {
     initSounds();
     sounds::play("main_sound", sounds::volumeMain);
+    heroes::initAttacks();
 
     CONSOLE_CURSOR_INFO cursor;
 
@@ -134,8 +135,15 @@ void mainLoop()
 
             battle::graphics::display();
 
-            int code = getCode();
-            int result = battle::logic::update(code);
+            int code;
+            static int result;
+
+            if (result != 1)
+            {
+                code = getCode();
+            }
+
+            result = battle::logic::update(code);
 
             if (result == -1)
             {

@@ -19,7 +19,8 @@ namespace map
             "●", // камень
             "∆",  // дерево
             "░", // вода
-            "☼" // мина
+            "☼", // мина
+            " "
         };
 
         std::vector<std::string> legend = {
@@ -27,7 +28,8 @@ namespace map
             "rock",
             "tree",
             "water",
-            "bomb"
+            "bomb",
+            "clear symbol"
         };
 
         int currentPoint = 0;
