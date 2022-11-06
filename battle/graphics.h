@@ -21,7 +21,7 @@ namespace battle
         std::vector<std::string> menu = {
             "Move",
             "Attack",
-            "Show hp"
+            "Show health of team"
         };
 
         bool coloredMoves = false;

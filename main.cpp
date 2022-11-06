@@ -81,18 +81,21 @@ void mainLoop()
     bool change = false;
     bool playBattle = false;
 
+    sounds::play("main_sound", sounds::volumeMain);
+
     while (true)
     {
         if (currentState == States::MAIN_MENU)
         {
+            if (playBattle)
+            {
+                sounds::stop("battle");
+                sounds::play("main_sound", sounds::volumeMain);
+                playBattle = false;
+            }
+
             if (!change)
             {
-                if (playBattle)
-                {
-                    sounds::stop("battle");
-                }
-
-                sounds::play("main_sound", sounds::volumeMain);
                 changeFont(10);
                 system("MODE 100, 70");
                 change = true;
