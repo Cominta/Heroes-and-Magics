@@ -505,9 +505,15 @@ namespace battle
 
         bool checkNextUnit()
         {
-            if (linearSearch(map[animY][animX], map::logic::elements) != -1 || map[animY][animX] == " ")
+            if (map[animY][animX] == " ")
             {
                 return false;
+            }
+
+            else if (linearSearch(map[animY][animX], map::logic::elements) != -1)
+            {
+                endTurn();
+                return true;
             }
 
             std::map<heroes::heroesClass, heroes::Attributes>* enemyTeam = returnEnemyTeam();

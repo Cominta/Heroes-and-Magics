@@ -278,7 +278,7 @@ namespace battle
 
                 for (int i = 0; i < round(percent / 10); i++)
                 {
-                    std::cout << "█";
+                    std::cout << "■";
                 }
 
                 for (int i = 0; i < 10 - round(percent / 10); i++)
